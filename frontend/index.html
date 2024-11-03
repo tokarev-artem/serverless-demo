@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway Example</title>
+</head>
+<body>
+    <h1>API Gateway Example</h1>
+
+    <label for="tokenInput">Authorization Token:</label>
+    <input type="text" id="tokenInput" placeholder="Enter your token here">
+    <br><br>
+
+    <label for="itemName">Item Name:</label>
+    <input type="text" id="itemName" placeholder="Enter item name">
+    <br><br>
+
+    <button onclick="fetchList()">Fetch List</button>
+    <button onclick="updateItem()">Update Item</button>
+    <h2>List Data:</h2>
+    <pre id="listOutput"></pre> 
+
+    <script>
+        const apiBaseUrl = "https://<id>>.execute-api.<region>.amazonaws.com";
+
+        async function fetchList() {
+            const token = document.getElementById("tokenInput").value;
+            if (!token) {
+                alert("Please enter a token.");
+                return;
+            }
+            try {
+                const response = await fetch(`${apiBaseUrl}/read`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `${token}`
+                    }
+                });
+                const data = await response.json();
+                document.getElementById("listOutput").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error("Error fetching list:", error);
+                document.getElementById("listOutput").textContent = "Error fetching list.";
+
+            }
+        }
+
+        async function updateItem() {
+            const token = document.getElementById("tokenInput").value;
+            const itemName = document.getElementById("itemName").value;
+
+            if (!token) {
+                alert("Please enter a token.");
+                return;
+            }
+            if (!itemName) {
+                alert("Please enter an item name.");
+                return;
+            }
+            try {
+                const response = await fetch(`${apiBaseUrl}/write`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `${token}`,
+                        'Content-Type': 'application/json'
+
+                    },
+                    body: JSON.stringify({ CommonName: itemName })
+
+                });
+                const data = await response.json();
+                console.log("Update response:", data);
+            } catch (error) {
+                console.error("Error updating item:", error);
+            }
+        }
+    </script>
+</body>
+</html>
+
